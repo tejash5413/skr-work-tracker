@@ -266,6 +266,7 @@ function App() {
                 handleEditTask={handleEditTask}
                 handleDeleteTask={handleDeleteTask}
                 progressBadge={progressBadge}
+                loadTasksFromSheet={loadTasksFromSheet}
               />
             )}
 
