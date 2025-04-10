@@ -14,6 +14,16 @@ import jobImg from './assets/job.svg';
 import workImg from './assets/work.svg';
 
 
+const postToGoogleSheet = async (task) => {
+  await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(task),
+  });
+};
 
 
 function App() {
@@ -94,9 +104,11 @@ function App() {
       const updatedTasks = [...tasks];
       updatedTasks[editingIndex] = newTask;
       setTasks(updatedTasks);
+    
       setToastMessage('Task updated successfully');
     } else {
       setTasks([...tasks, newTask]);
+      postToGoogleSheet(newTask);
       setToastMessage('Task created successfully');
     }
     resetForm();
