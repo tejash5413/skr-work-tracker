@@ -52,17 +52,20 @@ function App() {
     ROJA: 'SKR@1111',
     BHUVANA: 'SKR@1111'
   };
+ 
+
   const loadTasksFromSheet = async () => {
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec");
+      const response = await fetch('https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       setTasks(data);
     } catch (err) {
-      console.error("Failed to load tasks from sheet", err);
+      console.error('Failed to load tasks from sheet', err);
     }
   };
-
-  
   const handleLogin = () => {
     if (currentUser === 'SKR' && password === 'SKR@1160') {
       setUserRole('Admin');
@@ -75,7 +78,7 @@ function App() {
       alert('Invalid credentials');
     }
   };
-
+  
   const handleLogout = () => {
     setLoggedIn(false);
     setCurrentUser('');
