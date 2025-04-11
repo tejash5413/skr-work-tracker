@@ -9,12 +9,15 @@ const WorkAllocation = ({
   handleStatusUpdate,
   handleEditTask,
   handleDeleteTask,
+  
   progressBadge
 }) => {
   const [statusChanges, setStatusChanges] = useState({});
-  const [editableIndex, setEditableIndex] = useState(null);
-  
+  const [descChanges, setDescChanges] = useState({});
 
+  const [editableDescIndex, setEditableDescIndex] = useState(null);
+  const [editableStatusIndex, setEditableStatusIndex] = useState(null);
+  
   const handleStatusChange = (index, newProgress) => {
     
     setStatusChanges({ ...statusChanges, [index]: newProgress });
@@ -34,20 +37,24 @@ const WorkAllocation = ({
       console.error("Failed to update Google Sheets", err);
     }
   };
-  const handleSaveStatus = (index) => {
+  const handleSaveStatus = async(index) => {
+    
     if (statusChanges[index]) {
         
       handleStatusUpdate(index, statusChanges[index]);
       const updatedTask = {
         ...tasks[index],
+        
         progress: statusChanges[index]
+        
+        
         
       };
       postToGoogleSheet(updatedTask); 
       const updated = { ...statusChanges };
       delete updated[index];
       setStatusChanges(updated);
-      setEditableIndex(null);
+      setEditableStatusIndex(null);
         
     }
   };
@@ -66,7 +73,9 @@ const WorkAllocation = ({
   };
   // List of allowed employee usernames
   const allowedEmployees = ['UMESH', 'MADHU', 'RAKSHITHA', 'ROJA', 'BHUVANA'];
-
+  const handleDescChange = (index, newDesc) => {
+    setDescChanges((prev) => ({ ...prev, [index]: newDesc }));
+  };
   return (
     <div className="row">
       {tasks.map((task, index) => (
@@ -79,7 +88,59 @@ const WorkAllocation = ({
             <h5 className="text-primary mb-2">{task.taskName}</h5>
                 
             <p><span className="fw-bold text-secondary">Job Title:</span> {task.employeeName}</p>
-            <p><span className="fw-bold text-secondary">Description:</span> <em>{task.taskDesc}</em></p>
+            <p>
+  <span className="fw-bold text-secondary">Description:</span>{' '}
+  {userRole === 'Employee' &&
+  task.assignedTo === currentUser &&
+  allowedEmployees.includes(currentUser) ? (
+    <>
+      {editableDescIndex === index ? (
+        <textarea
+          className="form-control mt-1"
+          rows="2"
+          value={descChanges[index] || task.taskDesc}
+          onChange={(e) => handleDescChange(index, e.target.value)}
+        />
+      ) : (
+        <>
+          <em>{task.taskDesc}</em>
+          <button
+            className="btn btn-sm btn-outline-primary ms-3"
+            onClick={() => setEditableDescIndex(index)}
+          >
+            Edit
+          </button>
+        </>
+      )}
+      {editableDescIndex === index && (
+        <>
+          <button
+            className="btn btn-sm btn-success mt-2 me-2"
+            onClick={() => {
+              const updatedTask = {
+                ...tasks[index],
+                taskDesc: descChanges[index] || task.taskDesc,
+              };
+              postToGoogleSheet(updatedTask);
+              setEditableDescIndex(null);
+            }}
+            disabled={!descChanges[index] || descChanges[index] === task.taskDesc}
+          >
+            Update Desc
+          </button>
+          <button
+            className="btn btn-sm btn-secondary mt-2"
+            onClick={() => setEditableDescIndex(null)}
+          >
+            Cancel
+          </button>
+        </>
+      )}
+    </>
+  ) : (
+    <em>{task.taskDesc}</em>
+  )}
+</p>
             <p><span className="fw-bold text-secondary">State:</span> {task.taskState}</p>
             <p><span className="fw-bold text-secondary">Assigned To:</span> <span className="text-dark fw-semibold">{task.assignedTo}</span></p>
             <p className="card-text"><strong>Assigned Date:</strong> {formatDateToIST(task.assignedDateTime)}</p>
@@ -95,7 +156,7 @@ const WorkAllocation = ({
               <span className="fw-bold text-secondary">Progress:</span>{' '}
               {userRole === 'Employee' && task.assignedTo === currentUser && allowedEmployees.includes(currentUser) ? (
                 <>
-                  {editableIndex === index ? (
+                  {editableStatusIndex === index ? (
                     <>
                       <select
                         className="form-select mt-1"
@@ -118,7 +179,7 @@ const WorkAllocation = ({
                       </button>
                       <button
                         className="btn btn-sm btn-secondary mt-2"
-                        onClick={() => setEditableIndex(null)}
+                        onClick={() => setEditableStatusIndex(null)}
                       >
                         Cancel
                       </button>
@@ -128,7 +189,7 @@ const WorkAllocation = ({
                       <span className="ms-2">{progressBadge(task.progress)}</span>
                       <button
                         className="btn btn-sm btn-outline-primary ms-3"
-                        onClick={() => setEditableIndex(index)}
+                        onClick={() => setEditableStatusIndex(index)}
                       >
                         Edit
                       </button>

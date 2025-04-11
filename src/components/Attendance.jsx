@@ -41,6 +41,7 @@ const Attendance = ({ employees,postToGoogleSheetAttendance }) => {
       };
       postToGoogleSheetAttendance(newRecord);
       alert("✅ Attendance submitted successfully!");
+      
       setRecords([...records, newRecord]);
       setSelectedEmployee('');
       setStatus('Present');

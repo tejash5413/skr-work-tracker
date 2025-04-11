@@ -12,7 +12,6 @@ const CreateJob = ({
   assignedDateTime,
   setAssignedDateTime,
   handleAddTask,
-
   setEmployeeName,
   setTaskName,
   setTaskState,
@@ -41,7 +40,7 @@ const CreateJob = ({
         </div>
         <div className="col-md-6">
           <label className="form-label">Deadline</label>
-          <input type="date" className="form-control" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+          <input type="datetime-local" className="form-control" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
         </div>
         <div className="col-12">
           <label className="form-label">Work Description</label>

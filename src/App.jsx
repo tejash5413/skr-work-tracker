@@ -4,7 +4,7 @@ import WorkAllocation from './components/WorkAllocation';
 import ProgressOverview from './components/ProgressOverview';
 import EmployeeAttendance from './components/EmployeeAttendance';
 import Attendance from './components/Attendance';
-import { postToGoogleSheetAttendance } from './utils/googleSheetHelper'; // path depends on your project
+import { postToGoogleSheetAttendance } from './utils/googleSheetHelper'; 
 
 import { v4 as uuidv4 } from 'uuid';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -49,7 +49,18 @@ function App() {
     ROJA: 'SKR@1111',
     BHUVANA: 'SKR@1111'
   };
- 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    const storedRole = localStorage.getItem('userRole');
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+  
+    if (isLoggedIn && storedUser && storedRole) {
+      setCurrentUser(storedUser);
+      setUserRole(storedRole);
+      setLoggedIn(true);
+      loadTasksFromSheet(); // reload data on refresh
+    }
+  }, []);
 
   const loadTasksFromSheet = async () => {
     try {
@@ -101,10 +112,16 @@ function App() {
     if (currentUser === 'SKR' && password === 'SKR@1160') {
       setUserRole('Admin');
       setLoggedIn(true);
+      localStorage.setItem('currentUser', currentUser);
+      localStorage.setItem('userRole', 'Admin');
+      localStorage.setItem('loggedIn', 'true');
       loadTasksFromSheet(); 
     } else if (employeeAccounts[currentUser] && password === employeeAccounts[currentUser]) {
       setUserRole('Employee');
       setLoggedIn(true);
+      localStorage.setItem('currentUser', currentUser);
+      localStorage.setItem('userRole', 'Employee');
+      localStorage.setItem('loggedIn', 'true');
       loadTasksFromSheet(); 
     } else {
       alert('Invalid credentials');
@@ -117,6 +134,10 @@ function App() {
     setPassword('');
     setUserRole('');
     setActiveTab('create');
+  
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('loggedIn');
   };
 
   const resetForm = () => {
