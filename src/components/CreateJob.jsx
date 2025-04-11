@@ -74,6 +74,7 @@ const CreateJob = ({
           <label className="form-label">Progress</label>
           <select className="form-select" value={progress} onChange={(e) => setProgress(e.target.value)}>
             <option value="Not Started">🕒 Not Started</option>
+            <option value="Assing">📌Assing</option>
             <option value="In Progress">🔧 In Progress</option>
             <option value="Completed">✅ Completed</option>
           </select>

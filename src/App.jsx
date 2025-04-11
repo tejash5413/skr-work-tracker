@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import CreateJob from './components/CreateJob';
 import WorkAllocation from './components/WorkAllocation';
 import ProgressOverview from './components/ProgressOverview';
+import EmployeeAttendance from './components/EmployeeAttendance';
+import Attendance from './components/Attendance';
+import { postToGoogleSheetAttendance } from './utils/googleSheetHelper'; // path depends on your project
+
 import { v4 as uuidv4 } from 'uuid';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -12,18 +16,11 @@ import 'animate.css';
 import loginImg from './assets/login.svg';
 import jobImg from './assets/job.svg';
 import workImg from './assets/work.svg';
+import attendence from './assets/Aatten.svg';
 
 
-const postToGoogleSheet = async (task) => {
-  await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(task),
-  });
-};
+
+
 
 
 function App() {
@@ -62,10 +59,44 @@ function App() {
       }
       const data = await response.json();
       setTasks(data);
+      
     } catch (err) {
       console.error('Failed to load tasks from sheet', err);
+      alert("❌ Failed to Load Data!");
+
     }
   };
+  const postToGoogleSheet = async (task) => {
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {
+        method: "POST",
+        mode: "no-cors", // 👈 use this!
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(task)
+      });
+      alert("✅ Task synced with Google Sheets");
+    } catch (err) {
+      console.error("Google Sheets error:", err);
+      alert("❌ Failed to sync with Google Sheets");
+    }
+  };
+  const postToGoogleSheetDelete = async (taskId) => {
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: taskId, action: "delete" })
+      });
+    } catch (err) {
+      console.error("❌ Failed to delete from Google Sheets", err);
+    }
+  };
+  
   const handleLogin = () => {
     if (currentUser === 'SKR' && password === 'SKR@1160') {
       setUserRole('Admin');
@@ -74,6 +105,7 @@ function App() {
     } else if (employeeAccounts[currentUser] && password === employeeAccounts[currentUser]) {
       setUserRole('Employee');
       setLoggedIn(true);
+      loadTasksFromSheet(); 
     } else {
       alert('Invalid credentials');
     }
@@ -119,22 +151,36 @@ function App() {
       const updatedTasks = [...tasks];
       updatedTasks[editingIndex] = newTask;
       setTasks(updatedTasks);
-    
+      alert("Task updated successfully");
+
+
       setToastMessage('Task updated successfully');
     } else {
       setTasks([...tasks, newTask]);
-      postToGoogleSheet(newTask);
+      alert("Task created successfully");
+
       setToastMessage('Task created successfully');
     }
+    postToGoogleSheet(newTask);
+
     resetForm();
   };
 
   const handleStatusUpdate = (index, newProgress) => {
     const updatedTasks = [...tasks];
+
     updatedTasks[index].progress = newProgress;
+    setTasks(prevTasks =>
+      prevTasks.map(t => (t.id === tasks.id ? updatedTasks : t))
+      
+    );
+    postToGoogleSheet(updatedTasks); 
+
     updatedTasks[index].completionDate = newProgress === 'Completed' ? new Date().toISOString().split('T')[0] : '';
     setTasks(updatedTasks);
     setToastMessage('Progress updated');
+   
+
   };
 
   const handleEditTask = (index) => {
@@ -153,8 +199,12 @@ function App() {
   };
 
   const handleDeleteTask = (index) => {
+    const taskToDelete = tasks[index]; // ✅ get the actual task
     setTasks(tasks.filter((_, i) => i !== index));
     setToastMessage('Task deleted');
+    alert("Task Deleted successfully");
+
+    postToGoogleSheetDelete(taskToDelete.id); // ✅ pass correct ID
   };
 
   const progressBadge = (status) => {
@@ -162,6 +212,7 @@ function App() {
       case 'Not Started': return <span className="badge bg-secondary">Not Started</span>;
       case 'In Progress': return <span className="badge bg-warning text-dark">In Progress</span>;
       case 'Completed': return <span className="badge bg-success">Completed</span>;
+      case 'Assing': return <span className="badge bg-info">Assing</span>;
       default: return status;
     }
   };
@@ -210,6 +261,13 @@ function App() {
             </div>
 
             <ul className="nav nav-tabs mb-4">
+            <li className="nav-item">
+      <button
+  className={`nav-link ${activeTab === 'attendance' ? 'active' : ''}`}
+  onClick={() => setActiveTab('attendance')}>
+    <img src={attendence} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
+  Attendance
+</button>              </li>
               <li className="nav-item">
                 
               <button className={`nav-link ${activeTab === 'create' ? 'active' : ''}`} onClick={() => setActiveTab('create')}>
@@ -217,6 +275,7 @@ function App() {
   Create Job
 </button>
               </li>
+              
               <li className="nav-item">
               <button className={`nav-link ${activeTab === 'allocation' ? 'active' : ''}`} onClick={() => setActiveTab('allocation')}>
         <img src={workImg} alt="Work Allocation" style={{ width: '100px', marginRight: '6px' }} />
@@ -227,6 +286,7 @@ function App() {
         <img src={loginImg} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
         Progress Overview
       </button>              </li>
+
             </ul>
 
             {activeTab === 'create' && userRole === 'Admin' && (
@@ -276,6 +336,20 @@ function App() {
                 userRole={userRole}
               />
             )}
+{activeTab === 'attendance' && userRole === 'Admin' && (
+  <Attendance
+    employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
+    postToGoogleSheetAttendance={postToGoogleSheetAttendance}
+  />
+)}
+
+{activeTab === 'attendance' && userRole === 'Employee' && (
+  <EmployeeAttendance
+    currentUser={currentUser}
+    postToGoogleSheetAttendance={postToGoogleSheetAttendance}
+  />
+)}
+
           </>
         )}
       </div>
@@ -289,7 +363,7 @@ function App() {
         </div>
       </div>
       <footer className="text-center mt-5 py-3 text-white" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(6px)' }}>
-        <small>© 2024 SKR Group. All Rights Reserved.</small>
+        <small>© 2024 SKR Career Guidance. All Rights Reserved.</small>
       </footer>
     </div>
   );

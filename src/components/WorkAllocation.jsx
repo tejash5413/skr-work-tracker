@@ -13,27 +13,64 @@ const WorkAllocation = ({
 }) => {
   const [statusChanges, setStatusChanges] = useState({});
   const [editableIndex, setEditableIndex] = useState(null);
+  
 
   const handleStatusChange = (index, newProgress) => {
+    
     setStatusChanges({ ...statusChanges, [index]: newProgress });
+    
   };
-
+  const postToGoogleSheet = async (task) => {
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(task),
+      });
+    } catch (err) {
+      console.error("Failed to update Google Sheets", err);
+    }
+  };
   const handleSaveStatus = (index) => {
     if (statusChanges[index]) {
+        
       handleStatusUpdate(index, statusChanges[index]);
+      const updatedTask = {
+        ...tasks[index],
+        progress: statusChanges[index]
+        
+      };
+      postToGoogleSheet(updatedTask); 
       const updated = { ...statusChanges };
       delete updated[index];
       setStatusChanges(updated);
       setEditableIndex(null);
+        
     }
   };
-
+  const formatDateToIST = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
   // List of allowed employee usernames
   const allowedEmployees = ['UMESH', 'MADHU', 'RAKSHITHA', 'ROJA', 'BHUVANA'];
 
   return (
     <div className="row">
       {tasks.map((task, index) => (
+        task && task.taskName ? (
         <div key={task.id} className="col-md-6 mb-2">
           <div className="card p-3 shadow-sm border-start border-primary border-4">
           <div className="row align-items-start">
@@ -45,10 +82,12 @@ const WorkAllocation = ({
             <p><span className="fw-bold text-secondary">Description:</span> <em>{task.taskDesc}</em></p>
             <p><span className="fw-bold text-secondary">State:</span> {task.taskState}</p>
             <p><span className="fw-bold text-secondary">Assigned To:</span> <span className="text-dark fw-semibold">{task.assignedTo}</span></p>
+            <p className="card-text"><strong>Assigned Date:</strong> {formatDateToIST(task.assignedDateTime)}</p>
+
             <p><span className="fw-bold text-secondary">Priority:</span> <span className={
               task.priority === 'High' ? 'text-danger' : task.priority === 'Medium' ? 'text-warning' : 'text-success'
             }>{task.priority}</span></p>
-            <p><span className="fw-bold text-secondary">Deadline:</span> {task.deadline}</p>
+            <p><span className="fw-bold text-secondary"><strong>Deadline:</strong></span> {formatDateToIST(task.deadline)}</p>
             {task.completionDate && (
               <p><span className="fw-bold text-secondary">Completed On:</span> {task.completionDate}</p>
             )}
@@ -66,11 +105,14 @@ const WorkAllocation = ({
                         <option value="Not Started">🕒 Not Started</option>
                         <option value="In Progress">🔧 In Progress</option>
                         <option value="Completed">✅ Completed</option>
+                        
                       </select>
+                      
                       <button
                         className="btn btn-sm btn-success mt-2 me-2"
                         onClick={() => handleSaveStatus(index)}
                         disabled={!statusChanges[index] || statusChanges[index] === task.progress}
+                        
                       >
                         Update Status
                       </button>
@@ -112,6 +154,7 @@ const WorkAllocation = ({
       
         </div>
         </div>
+      ) : null
       ))}
     </div>
   );
