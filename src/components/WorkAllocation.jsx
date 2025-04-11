@@ -14,10 +14,13 @@ const WorkAllocation = ({
 }) => {
   const [statusChanges, setStatusChanges] = useState({});
   const [descChanges, setDescChanges] = useState({});
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterEmployee, setFilterEmployee] = useState('All');
 
   const [editableDescIndex, setEditableDescIndex] = useState(null);
   const [editableStatusIndex, setEditableStatusIndex] = useState(null);
-  
+  const employeeList = ['All', ...new Set(tasks.map(task => task.assignedTo).filter(Boolean))];
+
   const handleStatusChange = (index, newProgress) => {
     
     setStatusChanges({ ...statusChanges, [index]: newProgress });
@@ -78,7 +81,45 @@ const WorkAllocation = ({
   };
   return (
     <div className="row">
-      {tasks.map((task, index) => (
+      <div className="d-flex justify-content-end align-items-center gap-3 mb-3 flex-wrap">
+  {/* 👤 Employee Filter */}
+  <select
+    className=" form-select w-auto filter-select"
+    value={filterEmployee}
+    onChange={(e) => setFilterEmployee(e.target.value)}
+  >
+    {employeeList.map((emp, idx) => (
+      <option key={idx} value={emp}>
+        👤 {emp}
+      </option>
+    ))}
+  </select>
+
+  {/* 📊 Status Filter */}
+  <select
+    className="form-select w-auto filter-select"
+    value={filterStatus}
+    onChange={(e) => setFilterStatus(e.target.value)}
+  >
+    <option value="All">🔎 All Tasks</option>
+    <option value="Assing">📌 Assigned</option>
+    <option value="Not Started">🕒 Not Started</option>
+    <option value="In Progress">🔧 In Progress</option>
+    <option value="Completed">✅ Completed</option>
+  </select>
+</div>
+  
+      {tasks
+  .filter(task => {
+    const statusMatch =
+      filterStatus === 'All' || task.progress === filterStatus || (filterStatus === 'Assing' && !task.progress);
+
+    const employeeMatch =
+      filterEmployee === 'All' || task.assignedTo === filterEmployee;
+
+    return statusMatch && employeeMatch;
+  })
+  .map((task, index) => (
         task && task.taskName ? (
         <div key={task.id} className="col-md-6 mb-2">
           <div className="card p-3 shadow-sm border-start border-primary border-4">
@@ -86,7 +127,7 @@ const WorkAllocation = ({
           <div className="col-10">
 
             <h5 className="text-primary mb-2">{task.taskName}</h5>
-                
+
             <p><span className="fw-bold text-secondary">Job Title:</span> {task.employeeName}</p>
             <p>
   <span className="fw-bold text-secondary">Description:</span>{' '}

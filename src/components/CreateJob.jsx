@@ -22,6 +22,7 @@ const CreateJob = ({
   setProgress,
   editingIndex
 }) => {
+  
   return (
     <div className="card p-4 shadow-sm card animate__animated animate__fadeInUp">
       <h5 className="mb-3">Create a Job</h5>
