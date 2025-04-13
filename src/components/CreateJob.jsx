@@ -22,7 +22,7 @@ const CreateJob = ({
   setProgress,
   editingIndex
 }) => {
-  
+
   return (
     <div className="card p-4 shadow-sm card animate__animated animate__fadeInUp">
       <h5 className="mb-3">Create a Job</h5>
@@ -50,13 +50,13 @@ const CreateJob = ({
         <div className="col-md-6">
           <label className="form-label">Assign To</label>
           <select className="form-select" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
-  <option value="">-- Select Employee --</option>
-  <option value="UMESH">UMESH</option>
-  <option value="MADHU">MADHU</option>
-  <option value="RAKSHITHA">RAKSHITHA</option>
-  <option value="ROJA">ROJA</option>
-  <option value="BHUVANA">BHUVANA</option>
-</select>
+            <option value="">-- Select Employee --</option>
+            <option value="UMESH">UMESH</option>
+            <option value="MADHU">MADHU</option>
+            <option value="RAKSHITHA">RAKSHITHA</option>
+            <option value="ROJA">ROJA</option>
+            <option value="BHUVANA">BHUVANA</option>
+          </select>
         </div>
         <div className="col-md-6">
           <label className="form-label">Assigned Date & Time</label>
