@@ -17,7 +17,11 @@ import loginImg from './assets/login.svg';
 import jobImg from './assets/job.svg';
 import workImg from './assets/work.svg';
 import attendence from './assets/Aatten.svg';
+import payroll from './assets/payroll.svg';
+import progressimg from './assets/progressimg.svg';
 
+
+import AdminPayroll from './components/AdminPayroll';
 
 
 
@@ -42,6 +46,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('create');
   const [darkMode, setDarkMode] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
   const employeeAccounts = {
     UMESH: 'SKR@1111',
     MADHU: 'SKR@1111',
@@ -272,16 +277,23 @@ function App() {
         
         : (
           <>
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className=" d-flex justify-content-between align-items-center mb-3">
               <h3>Task Management Tool</h3>
-              <div className="d-flex align-items-center gap-2">
+              <div className=" d-none d-md-flex d-flex align-items-center gap-2">
                 <span className="badge bg-info text-dark text-primary text-center fw-bold mb-10">{userRole}</span>
                 <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
                 <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
               </div>
             </div>
-
-            <ul className="nav nav-tabs mb-4">
+            <div>
+            <ul className="nav nav-tabs mb-4 d-none d-md-flex flex-wrap">
+            {userRole === 'Admin' && (
+                <li className="nav-item">
+                  <button className={`nav-link ${activeTab === 'payroll' ? 'active' : ''}`} onClick={() => setActiveTab('payroll')}>
+                    <img src={payroll} alt="Payroll" style={{ width: '100px', marginRight: '6px' }} /> Payroll
+                  </button>
+                </li>
+              )}
             <li className="nav-item">
       <button
   className={`nav-link ${activeTab === 'attendance' ? 'active' : ''}`}
@@ -304,12 +316,52 @@ function App() {
       </button>              </li>
               <li className="nav-item">
               <button className={`nav-link ${activeTab === 'progress' ? 'active' : ''}`} onClick={() => setActiveTab('progress')}>
-        <img src={loginImg} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
+        <img src={progressimg} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
         Progress Overview
       </button>              </li>
 
             </ul>
-
+            </div>
+            
+            <div className="d-md-none mb-3">
+            <span className="badge bg-info text-dark text-primary text-center fw-bold mb-10">{userRole}</span>
+                <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
+                <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>       
+  <select
+  
+    className="form-select fw-bold"
+    value={activeTab}
+    onChange={(e) => setActiveTab(e.target.value)}
+  >
+    {userRole === 'Admin' && <option value="payroll">📊 Payroll</option>}
+    <option value="attendance">🕒 Attendance</option>
+    <option value="create">🛠️ Create Job</option>
+    <option value="allocation">📋 Work Allocation</option>
+    <option value="progress">📈 Progress Overview</option>
+  </select>
+  
+</div>
+            <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
+  <div
+    id="payroll-toast"
+    className="toast align-items-center text-white bg-success border-0"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div className="d-flex">
+      <div className="toast-body fw-bold">
+        ✅ Payroll added successfully!
+      </div>
+      <button
+        type="button"
+        className="btn-close btn-close-white me-2 m-auto"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+</div>
             {activeTab === 'create' && userRole === 'Admin' && (
               
               <CreateJob
@@ -357,6 +409,14 @@ function App() {
                 userRole={userRole}
               />
             )}
+
+{activeTab === 'payroll' && (
+              <AdminPayroll
+                userRole={userRole}
+                employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
+                postToGoogleSheetPayroll={postToGoogleSheet}
+              />
+            )}
 {activeTab === 'attendance' && userRole === 'Admin' && (
   <Attendance
     employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
@@ -384,7 +444,7 @@ function App() {
         </div>
       </div>
       <footer className="text-center mt-5 py-3 text-white" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(6px)' }}>
-        <small>© 2024 SKR Career Guidance. All Rights Reserved.</small>
+        <small>© 2025 SKR Career Guidance. All Rights Reserved.</small>
       </footer>
     </div>
   );

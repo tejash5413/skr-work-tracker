@@ -114,3 +114,8 @@ button:focus {
 .filter-select option:hover {
   background-color: #f0f9ff;
 }
+.card:hover {
+  transform: translateY(-3px);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+}

@@ -10,7 +10,6 @@ const Attendance = ({ employees,postToGoogleSheetAttendance }) => {
 const [editRecord, setEditRecord] = useState(null);
 const [filterEmployee, setFilterEmployee] = useState("All");
 const [filterMonth, setFilterMonth] = useState("All");
-const now = new Date();
 
 
     const itemsPerPage = 10; // Show 10 records per page
@@ -19,7 +18,11 @@ const now = new Date();
       try {
         const response = await fetch("https://script.google.com/macros/s/AKfycby06KKg93F7RTIpsy0L-LcRLNaOLgeRLLVtXJ4xPIX2C5qlZksvockNHJhiowx1_X1z/exec");
         const data = await response.json();
-        setRecords(data); // ✅ updates table
+        const normalized = data.map((rec) => ({
+          ...rec,
+          date: normalizeDate(rec.date)
+        }));
+        setRecords(normalized); // ✅ updates table
       } catch (error) {
         console.error("Failed to fetch attendance data:", error);
       }
@@ -29,44 +32,63 @@ const now = new Date();
   }, []);
   const handleMarkAttendance = () => {
     if (selectedEmployee && selectedDate) {
+      const [yyyy, mm, dd] = selectedDate.split('-'); // from yyyy-MM-dd
+
+      // Convert selected date to IST-localized dd-mm-yyyy
+  
+      const formattedDate = `${dd}-${mm}-${yyyy}`; // ✅ dd-MM-yyyy
+
+  
+      const formattedTime = new Date().toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+  
       const newRecord = {
-        action : "add",
-        employee: selectedEmployee, // or selectedEmployee for Admin
+        action: "add",
+        employee: selectedEmployee,
         status,
-        date: now.toLocaleDateString('en-IN', {
-          timeZone: 'Asia/Kolkata',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        }), // Formats the date in dd-mm-yyyy
-        time: now.toLocaleString('en-IN', {
-          timeZone: 'Asia/Kolkata',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true
-        })
+        date: formattedDate,
+        time: formattedTime
       };
+  
       postToGoogleSheetAttendance(newRecord);
-      alert("✅ Attendance submitted successfully!");
-      
-      setRecords([...records, newRecord]);
+      alert(`✅ Attendance marked for ${selectedEmployee} on ${formattedDate}`);
+  
+      // Update UI
+      setRecords((prev) => [...prev, newRecord]);
       setSelectedEmployee('');
       setStatus('Present');
-      setSelectedDate(new Date().toISOString().split('T')[0]);
-      
-
-
+      setSelectedDate(new Date().toISOString().split('T')[0]); // reset to today
+    } else {
+      alert("⚠️ Please select both employee and date before submitting.");
     }
   };
-  const handleSaveEdit = async (index) => {
-    const updated = [...records];
-    updated[index] = editRecord;
   
+  
+  const handleSaveEdit = async (index) => {
+    
+    const dateObj = new Date(selectedDate + 'T00:00:00');
+const formattedDate = dateObj.toLocaleDateString('en-IN', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: 'Asia/Kolkata'
+}).replace(/\//g, '-'); 
+    const updatedRecord = {
+      ...editRecord,
+      date: formattedDate,
+      
+    };
+  
+    const updated = [...records];
+    updated[index] = updatedRecord;
     setRecords(updated);
     setEditIndex(null);
   
-    // POST updated row to Google Sheets
     try {
       await fetch("https://script.google.com/macros/s/AKfycby06KKg93F7RTIpsy0L-LcRLNaOLgeRLLVtXJ4xPIX2C5qlZksvockNHJhiowx1_X1z/exec", {
         method: "POST",
@@ -74,13 +96,16 @@ const now = new Date();
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...editRecord, action: "update", rowIndex: index }), // send rowIndex to update
+        body: JSON.stringify({ ...updatedRecord, action: "update", rowIndex: index }),
       });
       alert("✅ Record updated!");
     } catch (error) {
       alert("❌ Failed to update Google Sheet.");
+      console.error(error);
     }
   };
+  
+
   
   const handleDeleteRecord = async (index) => {
     const updated = [...records];
@@ -107,31 +132,92 @@ const now = new Date();
     }
   };
   const startIndex = (currentPage - 1) * itemsPerPage;
-
+  const normalizeDate = (dateStr) => {
+    if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) return dateStr;
+   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [yyyy, mm, dd] = dateStr.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  }
+    const d = new Date(dateStr);
+    if (!isNaN(d)) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`; // Convert to dd-MM-yyyy
+    }
+  
+    return dateStr; // fallback if invalid
+  };
+  
   const filteredRecords = records.filter((rec) => {
     if (!rec.date) return false;
   
-    const dateObj = new Date(rec.date); // parse ISO date
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-based
+    let mm = '';
   
-    // 🧪 Debug
+    // If in dd-MM-yyyy format
+    if (/^\d{2}-\d{2}-\d{4}$/.test(rec.date)) {
+      const [, month] = rec.date.split("-");
+      mm = month;
+    } 
+    // If it's an ISO date string like 2025-04-12T...
+    else {
+      const d = new Date(rec.date);
+      if (!isNaN(d)) {
+        mm = String(d.getMonth() + 1).padStart(2, '0');
+      } else {
+        return false;
+      }
+    }
+  
     console.log("📅 Record Date:", rec.date);
-    console.log("🔍 Extracted Month:", month);
+    console.log("🔍 Extracted Month:", mm);
     console.log("🎯 Selected Filter Month:", filterMonth);
   
-    const matchesMonth = filterMonth === "All" || month === filterMonth;
+    const matchesMonth = filterMonth === "All" || mm === filterMonth;
     const matchesEmployee = filterEmployee === "All" || rec.employee === filterEmployee;
   
     return matchesMonth && matchesEmployee;
   });
+  
+  
+  
   const paginatedRecords = filteredRecords.slice(startIndex, startIndex + itemsPerPage);
-  const formatDate = (isoTime) => {
-    const date = new Date(isoTime);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${month}-${day}-${year}`; // format date as dd-mm-yyyy
+
+  const formatDate = (inputDate) => {
+    if (!inputDate) return '';
+  
+    // Case 1: Already in dd-MM-yyyy format
+    if (/^\d{2}-\d{2}-\d{4}$/.test(inputDate)) {
+      return inputDate;
+    }
+  
+    // Case 2: yyyy-MM-dd from <input type="date" />
+    if (/^\d{4}-\d{2}-\d{2}$/.test(inputDate)) {
+      const [yyyy, mm, dd] = inputDate.split('-');
+      return `${dd}-${mm}-${yyyy}`;
+    }
+  
+    // Case 3: Incorrect mm-dd-yyyy format being interpreted as dd-MM-yyyy
+    if (/^\d{2}-\d{2}-\d{4}$/.test(inputDate)) {
+      const [mm, dd, yyyy] = inputDate.split('-');
+      return `${dd}-${mm}-${yyyy}`;
+    }
+  
+    // Case 4: ISO string
+    const date = new Date(inputDate);
+    if (!isNaN(date)) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+  
+    return inputDate;
   };
+  
+  
+  
+  
   const formatTime = (isoTime) => {
     const date = new Date(isoTime);
     return date.toLocaleString('en-IN', {
@@ -146,6 +232,21 @@ const now = new Date();
     setEditIndex(index);
     setEditRecord({ ...records[index] });
   };
+  
+  
+  const formatToInputDate = (ddmmyyyy) => {
+    if (!ddmmyyyy || !ddmmyyyy.includes('-')) return '';
+    const [dd, mm, yyyy] = ddmmyyyy.split('-');
+    return `${yyyy}-${mm}-${dd}`; // For <input type="date" />
+  };
+  
+  const formatToDisplayDate = (yyyymmdd) => {
+    if (!yyyymmdd || !yyyymmdd.includes('-')) return '';
+    const [yyyy, mm, dd] = yyyymmdd.split('-');
+    return `${dd}-${mm}-${yyyy}`; // Store back in dd-MM-yyyy
+  };
+  
+  
   return (
     <div className="p-4 bg-light rounded shadow-sm animate__animated animate__fadeInUp">
       <h4 className="mb-3">📋 Admin Attendance Manager</h4>
@@ -275,9 +376,9 @@ const now = new Date();
             <input
               type="date"
               className="form-control form-control-sm"
-              value={new Date(editRecord.date).toISOString().split('T')[0]}
+              value={formatToInputDate(editRecord.date)}
               onChange={(e) =>
-                setEditRecord({ ...editRecord, date: e.target.value })
+                setEditRecord({ ...editRecord, date:formatToDisplayDate(e.target.value)  })
               }
             />
           </td>
