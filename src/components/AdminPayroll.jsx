@@ -3,6 +3,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { postToGoogleSheetPayroll } from '../utils/googleSheetHelper';
 import logo from '../assets/SKR_Logo.png';
+import Accounts from './Accounts';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -13,6 +14,7 @@ const AdminPayroll = ({ employees, userRole }) => {
   const [filterMonth, setFilterMonth] = useState('');
   const [activeSubTab, setActiveSubTab] = useState('payroll');
   const [employeesData, setEmployeesData] = useState([]);
+
 
   const [employeeForm, setEmployeeForm] = useState({
     employeeId: '',
@@ -416,6 +418,9 @@ const AdminPayroll = ({ employees, userRole }) => {
         <li className="nav-item">
           <button className={`nav-link ${activeSubTab === 'payroll' ? 'active' : ''}`} onClick={() => setActiveSubTab('payroll')}>Payroll Manager</button>
         </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeSubTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveSubTab('accounts')} > Accounts</button>
+        </li>
       </ul>
       {activeSubTab === 'payroll' && (
         <div>
@@ -533,6 +538,7 @@ const AdminPayroll = ({ employees, userRole }) => {
               ) : (
                 <button className="btn btn-success w-100" onClick={handleSubmit}>➕ Add Payroll</button>
               )}
+
             </div>
           </div>
           <div className="row mb-4">
@@ -705,6 +711,9 @@ const AdminPayroll = ({ employees, userRole }) => {
           </div>
         </div>
       )}
+      {activeSubTab === 'accounts' && userRole === 'Admin' && (
+        <Accounts userRole={userRole} />
+      )}
 
       {activeSubTab === 'profile' && (
         <div>
@@ -738,12 +747,15 @@ const AdminPayroll = ({ employees, userRole }) => {
                 </div>
               </div>
             ))}
+
           </div>
 
 
         </div>
       )}
+
     </div>
+
   );
 };
 

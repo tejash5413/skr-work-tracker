@@ -26,6 +26,7 @@ const WorkAllocation = ({
     setStatusChanges({ ...statusChanges, [index]: newProgress });
 
   };
+
   const postToGoogleSheet = async (task) => {
     try {
       await fetch("https://script.google.com/macros/s/AKfycbw-IKd4AI4c5lgRD3owOAG0oDudKq-p7R7BexSBMngH1OrfxSliJ-yhthSxm89ZhQn-/exec", {

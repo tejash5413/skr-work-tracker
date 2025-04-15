@@ -56,6 +56,7 @@ const CreateJob = ({
             <option value="RAKSHITHA">RAKSHITHA</option>
             <option value="ROJA">ROJA</option>
             <option value="BHUVANA">BHUVANA</option>
+            <option value="TEJASH">BHUVANA</option>
           </select>
         </div>
         <div className="col-md-6">
