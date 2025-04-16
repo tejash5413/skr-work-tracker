@@ -67,7 +67,7 @@ const AdminPayroll = ({ employees, userRole }) => {
   const fetchPayrolls = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxlm8E94QZ0o74WlK3elUARn9MVUvhiApWw2y-u_K_i5_LpI611u6rlWwt6xx_1Q-NZ/exec?type=payroll');
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxlm8E94QZ0o74WlK3elUARn9MVUvhiApWw2y-u_K_i5_LpI611u6rlWwt6xx_1Q-NZ/exec?type=payroll");
       const data = await response.json();
       setPayrolls(data);
     } catch (err) {
@@ -734,7 +734,7 @@ const AdminPayroll = ({ employees, userRole }) => {
                     <p className="mb-1"><i className="bi bi-building text-info me-1"></i><strong>Department:</strong> {emp.department}</p>
                     <p className="mb-1"><i className="bi bi-person-badge text-warning me-1"></i><strong>Designation:</strong> {emp.designation}</p>
                     <p className="mb-1"><i className="bi bi-cash-coin text-danger me-1"></i><strong>Salary:</strong> ₹{emp.salary}</p>
-                    <p className="mb-1"><i className="bi bi-calendar-date text-secondary me-1"></i><strong>Joining Date:</strong> {formatDateToDMY(emp.joiningDate)}</p>
+                    <p className="mb-1"><i className="bi bi-calendar-date text-secondary me-1"></i><strong>Joining Date:</strong> {convertToInputDate(emp.joiningDate)}</p>
                     <p className="mb-1">
                       <i className="bi bi-circle-fill me-1" style={{ color: emp.status === 'Active' ? 'green' : emp.status === 'On Leave' ? 'orange' : 'gray' }}></i>
                       <strong>Status:</strong> {emp.status}

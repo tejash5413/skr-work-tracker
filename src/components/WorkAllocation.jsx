@@ -75,7 +75,7 @@ const WorkAllocation = ({
       hour12: true
     });
   };
-  const allowedEmployees = ['UMESH', 'MADHU', 'RAKSHITHA', 'ROJA', 'BHUVANA'];
+  const allowedEmployees = ['UMESH', 'MADHU', 'RAKSHITHA', 'ROJA', 'BHUVANA', 'TEJASH'];
   const handleDescChange = (index, newDesc) => {
     setDescChanges((prev) => ({ ...prev, [index]: newDesc }));
   };
