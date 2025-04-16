@@ -185,13 +185,14 @@ const Accounts = ({ userRole }) => {
                     <input type="number" className="form-control" value={monthlyBudgetInput} onChange={e => setMonthlyBudgetInput(e.target.value)} />
                 </div>
                 <div className="col-md-2 d-grid align-items-end">
-                    <button className="btn btn-dark" onClick={handleBudgetSave}>💾 Save Budget</button>
+                    <button className="btn btn-danger" onClick={handleBudgetSave}>💾 Save Budget</button>
                 </div>
             </div>
 
             <div className="row g-3 mb-3">
+                <label className="form-label">Date</label>
+
                 <div className="col-md-3">
-                    <label className="form-label">Date</label>
 
                     <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} placeholder="Date" />
                 </div>
