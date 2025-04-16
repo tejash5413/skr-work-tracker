@@ -177,7 +177,7 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
     };
 
     return (
-        <div className="p-4 bg-white rounded shadow-sm animate__animated animate__fadeInUp">
+        <div className="p-4  rounded shadow-sm animate__animated animate__fadeInUp">
             <h4 className="mb-3">🕒 Employee Login/Logout Tracker</h4>
 
             {userRole === 'Admin' && (

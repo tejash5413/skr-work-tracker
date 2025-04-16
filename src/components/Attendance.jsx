@@ -12,6 +12,7 @@ const Attendance = ({ employees, postToGoogleSheetAttendance, currentUser }) => 
   const [filterMonth, setFilterMonth] = useState("All");
   const [activeSubTab, setActiveSubTab] = useState('attendance');
 
+  const [darkMode] = useState(false);
 
   const itemsPerPage = 10;
   useEffect(() => {
@@ -230,236 +231,236 @@ const Attendance = ({ employees, postToGoogleSheetAttendance, currentUser }) => 
 
 
   return (
-    <div className="p-4 bg-light rounded shadow-sm animate__animated animate__fadeInUp">
-      <h4 className="mb-3">📋 Admin Attendance Manager</h4>
-      <ul className="nav nav-tabs mb-3">
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeSubTab === 'attendance' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('attendance')}
-          >
-            Attendance
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeSubTab === 'loginout' ? 'active' : ''}`}
-            onClick={() => setActiveSubTab('loginout')}
-          >
-            Login/Logout
-          </button>
-        </li>
-      </ul>
+    <div className={darkMode ? 'bg-dark text-white min-vh-100' : 'min-vh-100'}>
+      <div className="p-4  rounded shadow-sm animate__animated animate__fadeInUp">
+        <h4 className="mb-3">📋 Admin Attendance Manager</h4>
+        <ul className="nav nav-tabs mb-3">
+          <li className="nav-item">
+            <button
+              className={`nav-link ${activeSubTab === 'attendance' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('attendance')}
+            >
+              Attendance
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link ${activeSubTab === 'loginout' ? 'active' : ''}`}
+              onClick={() => setActiveSubTab('loginout')}
+            >
+              Login/Logout
+            </button>
+          </li>
+        </ul>
 
-      {activeSubTab === 'attendance' && (
-        <div>
-          {/* Your attendance JSX here */}
-          <h4>📝 Mark Your Attendance</h4>
-          <div className="row g-3 mb-4">
-            <div className="col-md-4">
-              <label className="form-label fw-bold">Select Employee:</label>
-              <select
-                className="form-select"
-                value={selectedEmployee}
-                onChange={(e) => setSelectedEmployee(e.target.value)}
-              >
-                <option value="">-- Choose --</option>
-                {employees.map((emp, i) => (
-                  <option key={i} value={emp}>{emp}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-md-4">
-              <label className="form-label fw-bold">Status:</label>
-              <select
-                className="form-select"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="Present">✅ Present</option>
-                <option value="Absent">❌ Absent</option>
-              </select>
-            </div>
-
-            <div className="col-md-4">
-              <label className="form-label fw-bold">Select Date:</label>
-              <input
-                type="date"
-                className="form-control"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </div>
-
-            <div className="col-12">
-              <button className="btn btn-success w-100" onClick={handleMarkAttendance}>
-                ➕ Mark Attendance
-              </button>
-            </div>
-          </div>
-
-          {records.length > 0 && (
-            <>
-              <h5 className="mt-4">📊 Attendance Records</h5>
-              <div className="d-flex flex-wrap gap-3 mb-3 align-items-center">
+        {activeSubTab === 'attendance' && (
+          <div >
+            {/* Your attendance JSX here */}
+            <h4>📝 Mark Your Attendance</h4>
+            <div className="row g-3 mb-4">
+              <div className="col-md-4">
+                <label className="form-label fw-bold">Select Employee:</label>
                 <select
-                  className="form-select w-auto"
-                  value={filterEmployee}
-                  onChange={(e) => setFilterEmployee(e.target.value)}
+                  className="form-select"
+                  value={selectedEmployee}
+                  onChange={(e) => setSelectedEmployee(e.target.value)}
                 >
-                  <option value="All">👤 All Employees</option>
+                  <option value="">-- Choose --</option>
                   {employees.map((emp, i) => (
                     <option key={i} value={emp}>{emp}</option>
                   ))}
                 </select>
+              </div>
 
+              <div className="col-md-4">
+                <label className="form-label fw-bold">Status:</label>
                 <select
-                  className="form-select w-auto"
-                  value={filterMonth}
-                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="form-select"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
                 >
-                  <option value="All">📅 All Months</option>
-                  {Array.from({ length: 12 }, (_, i) => {
-                    const monthName = new Date(0, i).toLocaleString("default", { month: "long" });
-
-                    return <option key={i} value={String(i + 1).padStart(2, '0')}>
-
-                      {monthName}
-                    </option>;
-                  })}
+                  <option value="Present">✅ Present</option>
+                  <option value="Absent">❌ Absent</option>
                 </select>
               </div>
 
-              <table className="table table-bordered table-striped mt-2">
-                <thead className="table-primary">
-                  <tr>
-                    <th>#</th>
-                    <th>Employee</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Actions</th>
+              <div className="col-md-4">
+                <label className="form-label fw-bold">Select Date:</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              </div>
 
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedRecords.map((rec, index) => {
-                    const globalIndex = startIndex + index;
-
-                    return (
-                      <tr key={index}>
-                        <td>{globalIndex + 1}</td>
-
-                        {editIndex === globalIndex ? (
-                          <>
-                            <td>
-                              <input
-                                className="form-control form-control-sm"
-                                value={editRecord.employee}
-                                onChange={(e) =>
-                                  setEditRecord({ ...editRecord, employee: e.target.value })
-                                }
-                              />
-                            </td>
-                            <td>
-                              <select
-                                className="form-select form-select-sm"
-                                value={editRecord.status}
-                                onChange={(e) =>
-                                  setEditRecord({ ...editRecord, status: e.target.value })
-                                }
-                              >
-                                <option value="Present">✅ Present</option>
-                                <option value="Absent">❌ Absent</option>
-                              </select>
-                            </td>
-                            <td>
-                              <input
-                                type="date"
-                                className="form-control form-control-sm"
-                                value={formatToInputDate(editRecord.date)}
-                                onChange={(e) =>
-                                  setEditRecord({ ...editRecord, date: formatToDisplayDate(e.target.value) })
-                                }
-                              />
-                            </td>
-                            <td>{formatTime(editRecord.time)}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-success me-2"
-                                onClick={() => handleSaveEdit(globalIndex)}
-                              >
-                                💾 Save
-                              </button>
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={() => setEditIndex(null)}
-                              >
-                                ❌ Cancel
-                              </button>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td>{rec.employee}</td>
-                            <td>{rec.status}</td>
-                            <td>{formatDate(rec.date)}</td>
-                            <td>{formatTime(rec.time)}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-warning me-2"
-                                onClick={() => handleEditRecord(globalIndex)}
-                              >
-                                ✏️ Edit
-                              </button>
-                              <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() => handleDeleteRecord(globalIndex)}
-                              >
-                                🗑 Delete
-                              </button>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                <button
-                  className="btn btn-outline-primary"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                  ⬅️ Previous
-                </button>
-
-                <span>
-                  Page {currentPage} of {Math.max(1, Math.ceil(filteredRecords.length / itemsPerPage))}
-                </span>
-
-                <button
-                  className="btn btn-outline-primary"
-                  disabled={currentPage >= Math.ceil(filteredRecords.length / itemsPerPage)}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                  Next ➡️
+              <div className="col-12">
+                <button className="btn btn-success w-100" onClick={handleMarkAttendance}>
+                  ➕ Mark Attendance
                 </button>
               </div>
-            </>
-          )}
-        </div>
-      )}
-      {activeSubTab === 'loginout' && (
-        <div>
+            </div>
+
+            {records.length > 0 && (
+              <>
+                <h5 className="mt-4">📊 Attendance Records</h5>
+                <div className="d-flex flex-wrap gap-3 mb-3 align-items-center">
+                  <select
+                    className="form-select w-auto"
+                    value={filterEmployee}
+                    onChange={(e) => setFilterEmployee(e.target.value)}
+                  >
+                    <option value="All">👤 All Employees</option>
+                    {employees.map((emp, i) => (
+                      <option key={i} value={emp}>{emp}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="form-select w-auto"
+                    value={filterMonth}
+                    onChange={(e) => setFilterMonth(e.target.value)}
+                  >
+                    <option value="All">📅 All Months</option>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const monthName = new Date(0, i).toLocaleString("default", { month: "long" });
+
+                      return <option key={i} value={String(i + 1).padStart(2, '0')}>
+
+                        {monthName}
+                      </option>;
+                    })}
+                  </select>
+                </div>
+                <table className="table table-bordered table-striped mt-2">
+                  <thead className="table-primary">
+                    <tr>
+                      <th>#</th>
+                      <th>Employee</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Actions</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedRecords.map((rec, index) => {
+                      const globalIndex = startIndex + index;
+
+                      return (
+                        <tr key={index}>
+                          <td>{globalIndex + 1}</td>
+
+                          {editIndex === globalIndex ? (
+                            <>
+                              <td>
+                                <input
+                                  className="form-control form-control-sm"
+                                  value={editRecord.employee}
+                                  onChange={(e) =>
+                                    setEditRecord({ ...editRecord, employee: e.target.value })
+                                  }
+                                />
+                              </td>
+                              <td>
+                                <select
+                                  className="form-select form-select-sm"
+                                  value={editRecord.status}
+                                  onChange={(e) =>
+                                    setEditRecord({ ...editRecord, status: e.target.value })
+                                  }
+                                >
+                                  <option value="Present">✅ Present</option>
+                                  <option value="Absent">❌ Absent</option>
+                                </select>
+                              </td>
+                              <td>
+                                <input
+                                  type="date"
+                                  className="form-control form-control-sm"
+                                  value={formatToInputDate(editRecord.date)}
+                                  onChange={(e) =>
+                                    setEditRecord({ ...editRecord, date: formatToDisplayDate(e.target.value) })
+                                  }
+                                />
+                              </td>
+                              <td>{formatTime(editRecord.time)}</td>
+                              <td>
+                                <button
+                                  className="btn btn-sm btn-success me-2"
+                                  onClick={() => handleSaveEdit(globalIndex)}
+                                >
+                                  💾 Save
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-secondary"
+                                  onClick={() => setEditIndex(null)}
+                                >
+                                  ❌ Cancel
+                                </button>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td>{rec.employee}</td>
+                              <td>{rec.status}</td>
+                              <td>{formatDate(rec.date)}</td>
+                              <td>{formatTime(rec.time)}</td>
+                              <td>
+                                <button
+                                  className="btn btn-sm btn-warning me-2"
+                                  onClick={() => handleEditRecord(globalIndex)}
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  onClick={() => handleDeleteRecord(globalIndex)}
+                                >
+                                  🗑 Delete
+                                </button>
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <button
+                    className="btn btn-outline-primary"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    ⬅️ Previous
+                  </button>
+
+                  <span>
+                    Page {currentPage} of {Math.max(1, Math.ceil(filteredRecords.length / itemsPerPage))}
+                  </span>
+
+                  <button
+                    className="btn btn-outline-primary"
+                    disabled={currentPage >= Math.ceil(filteredRecords.length / itemsPerPage)}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Next ➡️
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {activeSubTab === 'loginout' && (
           <EmployeeLoginLogout userRole="Admin" currentUser="Admin" />
 
-        </div>
-      )}
+        )}
 
+      </div>
     </div>
+
   );
 };
 

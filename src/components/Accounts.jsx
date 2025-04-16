@@ -175,8 +175,9 @@ const Accounts = ({ userRole }) => {
     if (userRole !== 'Admin') return null;
 
     return (
+
         <div className="container py-4">
-            <h4 className="text-dark fw-bold mb-4">💰 Company Expenditure Tracker</h4>
+            <h4 className=" fw-bold mb-4">💰 Company Expenditure Tracker</h4>
 
             <div className="row mb-3">
                 <div className="col-md-10">
@@ -190,7 +191,9 @@ const Accounts = ({ userRole }) => {
 
             <div className="row g-3 mb-3">
                 <div className="col-md-3">
-                    <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} />
+                    <label className="form-label">Date</label>
+
+                    <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} placeholder="Date" />
                 </div>
                 <div className="col-md-3">
                     <input type="text" name="description" className="form-control" value={form.description} onChange={handleChange} placeholder="Description" />
@@ -213,6 +216,7 @@ const Accounts = ({ userRole }) => {
             </div>
 
             <div className="row mb-3">
+                <label className="form-label">From - To </label>
                 <div className="col-md-6">
                     <input type="date" className="form-control" value={fromDate} onChange={e => setFromDate(e.target.value)} placeholder="From" />
                 </div>

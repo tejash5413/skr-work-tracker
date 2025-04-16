@@ -252,206 +252,208 @@ function App() {
   }, [toastMessage]);
 
   return (
+    <div class="container-fluid">
+      <div className={darkMode ? 'bg-dark text-white min-vh-100' : 'min-vh-100'} >
 
-    <div className={darkMode ? 'bg-dark text-white min-vh-100' : 'min-vh-100'} >
-
-      <div className="sticky-top bg-transparent container py-4 glass-effect rounded">
-        <div className="d-flex align-items-center mb-4">
-          <div className="d-flex align-items-center">
-            <img src={logo} alt="SKR Logo" style={{ width: '60px', height: '60px', marginRight: '15px' }} />
-            <h2 className="mb-0 fw-bold" style={{ color: '#6b400d' }}>SKR Work Progress Tracker</h2>
-          </div>
-        </div>
-        {!loggedIn ? (
-          <div className="card p-4 shadow-sm">
-            <div className="text-center">
-              <img src={loginImg} alt="Login Illustration" style={{ width: '200px', marginBottom: '1rem' }} />
-              <p className="lead">Welcome! Please log in to continue.</p>
+        <div className="sticky-top  container py-4 ">
+          <div className="d-flex align-items-center mb-4">
+            <div className="d-flex align-items-center">
+              <img src={logo} alt="SKR Logo" style={{ width: '60px', height: '60px', marginRight: '15px' }} />
+              <h2 className="mb-0 fw-bold" style={{ color: '#6b400d' }}>SKR Work Progress Tracker</h2>
             </div>
-            <h2 className="text-center">Login</h2>
-            <input type="text" className="form-control mb-2" placeholder="Username" value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} />
-            <input type="password" className="form-control mb-3" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button className="btn btn-primary w-100" onClick={handleLogin}>Login</button>
           </div>
-
-        )
-
-          : (
-            <>
-              <div className=" d-flex justify-content-between align-items-center mb-3">
-                <h3>Task Management Tool</h3>
-                <div className=" d-none d-md-flex d-flex align-items-center gap-2">
-                  <span className="  text-dark text-primary text-center fw-bold mb-10">{userRole}</span>
-                  <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
-                  <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
-                </div>
+          {!loggedIn ? (
+            <div className="card p-4 shadow-sm">
+              <div className="text-center">
+                <img src={loginImg} alt="Login Illustration" style={{ width: '200px', marginBottom: '1rem' }} />
+                <p className="lead">Welcome! Please log in to continue.</p>
               </div>
-              <div>
-                <ul className="nav nav-tabs mb-4 d-none d-md-flex flex-wrap">
-                  {userRole === 'Admin' && (
-                    <li className="nav-item">
-                      <button className={`nav-link ${activeTab === 'payroll' ? 'active' : ''}`} onClick={() => setActiveTab('payroll')}>
-                        <img src={payroll} alt="Payroll" style={{ width: '100px', marginRight: '6px' }} /> Payroll
-                      </button>
-                    </li>
-                  )}
-                  <li className="nav-item">
-                    <button
-                      className={`nav-link ${activeTab === 'attendance' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('attendance')}>
-                      <img src={attendence} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
-                      Attendance
-                    </button>              </li>
-                  <li className="nav-item">
+              <h2 className="text-center">Login</h2>
+              <input type="text" className="form-control mb-2" placeholder="Username" value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} />
+              <input type="password" className="form-control mb-3" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button className="btn btn-primary w-100" onClick={handleLogin}>Login</button>
+            </div>
 
-                    <button className={`nav-link ${activeTab === 'create' ? 'active' : ''}`} onClick={() => setActiveTab('create')}>
-                      <img src={jobImg} alt="Create Job" style={{ width: '100px', marginRight: '6px' }} />
-                      Create Job
-                    </button>
-                  </li>
+          )
 
-                  <li className="nav-item">
-                    <button className={`nav-link ${activeTab === 'allocation' ? 'active' : ''}`} onClick={() => setActiveTab('allocation')}>
-                      <img src={workImg} alt="Work Allocation" style={{ width: '100px', marginRight: '6px' }} />
-                      Work Allocation
-                    </button>              </li>
-                  <li className="nav-item">
-                    <button className={`nav-link ${activeTab === 'progress' ? 'active' : ''}`} onClick={() => setActiveTab('progress')}>
-                      <img src={progressimg} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
-                      Progress Overview
-                    </button>              </li>
-
-                </ul>
-              </div>
-
-              <div className="d-md-none mb-3">
-                <span className=" bg-info text-dark text-primary text-center fw-bold mb-10">{userRole}</span>
-                <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
-                <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
-                <select
-
-                  className=" form-select fw-bold"
-                  value={activeTab}
-                  onChange={(e) => setActiveTab(e.target.value)}
-                >
-                  {userRole === 'Admin' && <option value="payroll">📊 Payroll</option>}
-                  <option value="attendance">🕒 Attendance</option>
-                  <option value="create">🛠️ Create Job</option>
-                  <option value="allocation">📋 Work Allocation</option>
-                  <option value="progress">📈 Progress Overview</option>
-                </select>
-
-              </div>
-              <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
-                <div
-                  id="payroll-toast"
-                  className="toast align-items-center text-white bg-success border-0"
-                  role="alert"
-                  aria-live="assertive"
-                  aria-atomic="true"
-                >
-                  <div className="d-flex">
-                    <div className="toast-body fw-bold">
-                      ✅ Payroll added successfully!
-                    </div>
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white me-2 m-auto"
-                      data-bs-dismiss="toast"
-                      aria-label="Close"
-                    ></button>
+            : (
+              <>
+                <div className=" d-flex justify-content-between align-items-center mb-3">
+                  <h3>Task Management Tool</h3>
+                  <div className=" d-none d-md-flex d-flex align-items-center gap-2">
+                    <span className="  text-center fw-bold mb-10">{userRole}</span>
+                    <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
+                    <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
                   </div>
                 </div>
-              </div>
-              {activeTab === 'create' && userRole === 'Admin' && (
+                <div>
+                  <ul className="nav nav-tabs sticky-top mb-4 d-none d-md-flex flex-wrap">
+                    {userRole === 'Admin' && (
+                      <li className="nav-item">
+                        <button className={`nav-link ${activeTab === 'payroll' ? 'active' : ''}`} onClick={() => setActiveTab('payroll')}>
+                          <img src={payroll} alt="Payroll" style={{ width: '100px', marginRight: '6px' }} /> Payroll
+                        </button>
+                      </li>
+                    )}
+                    <li className="nav-item">
+                      <button
+                        className={`nav-link ${activeTab === 'attendance' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('attendance')}>
+                        <img src={attendence} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
+                        Attendance
+                      </button>              </li>
+                    <li className="nav-item">
 
-                <CreateJob
-                  employeeName={employeeName}
-                  taskName={taskName}
-                  taskState={taskState}
-                  deadline={deadline}
-                  taskDesc={taskDesc}
-                  assignedTo={assignedTo}
-                  priority={priority}
-                  progress={progress}
-                  assignedDateTime={assignedDateTime}
-                  setEmployeeName={setEmployeeName}
-                  setTaskName={setTaskName}
-                  setTaskState={setTaskState}
-                  setDeadline={setDeadline}
-                  setTaskDesc={setTaskDesc}
-                  setAssignedTo={setAssignedTo}
-                  setPriority={setPriority}
-                  setProgress={setProgress}
-                  setAssignedDateTime={setAssignedDateTime}
-                  handleAddTask={handleAddTask}
-                  editingIndex={editingIndex}
-                />
-              )}
+                      <button className={`nav-link ${activeTab === 'create' ? 'active' : ''}`} onClick={() => setActiveTab('create')}>
+                        <img src={jobImg} alt="Create Job" style={{ width: '100px', marginRight: '6px' }} />
+                        Create Job
+                      </button>
+                    </li>
 
-              {activeTab === 'allocation' && (
+                    <li className="nav-item">
+                      <button className={`nav-link ${activeTab === 'allocation' ? 'active' : ''}`} onClick={() => setActiveTab('allocation')}>
+                        <img src={workImg} alt="Work Allocation" style={{ width: '100px', marginRight: '6px' }} />
+                        Work Allocation
+                      </button>              </li>
+                    <li className="nav-item">
+                      <button className={`nav-link ${activeTab === 'progress' ? 'active' : ''}`} onClick={() => setActiveTab('progress')}>
+                        <img src={progressimg} alt="Progress Overview" style={{ width: '100px', marginRight: '6px' }} />
+                        Progress Overview
+                      </button>              </li>
 
-                <WorkAllocation
+                  </ul>
+                </div>
 
-                  tasks={tasks}
-                  userRole={userRole}
-                  currentUser={currentUser}
-                  handleStatusUpdate={handleStatusUpdate}
-                  handleEditTask={handleEditTask}
-                  handleDeleteTask={handleDeleteTask}
-                  progressBadge={progressBadge}
-                  loadTasksFromSheet={loadTasksFromSheet}
-                />
-              )}
+                <div className="d-md-none mb-3">
+                  <span className=" bg-info text-dark text-primary text-center fw-bold mb-10">{userRole}</span>
+                  <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
+                  <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
+                  <select
 
-              {activeTab === 'progress' && (
-                <ProgressOverview
-                  tasks={tasks}
-                  userRole={userRole}
-                />
-              )}
+                    className=" form-select fw-bold mb-3 "
+                    value={activeTab}
+                    onChange={(e) => setActiveTab(e.target.value)}
+                  >
+                    {userRole === 'Admin' && <option value="payroll">📊 Payroll</option>}
+                    <option value="attendance">🕒 Attendance</option>
+                    <option value="create">🛠️ Create Job</option>
+                    <option value="allocation">📋 Work Allocation</option>
+                    <option value="progress">📈 Progress Overview</option>
+                  </select>
 
-              {activeTab === 'payroll' && (
-                <AdminPayroll
-                  userRole={userRole}
-                  employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
-                  postToGoogleSheetPayroll={postToGoogleSheet}
-                />
-              )}
+                </div>
+                <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
+                  <div
+                    id="payroll-toast"
+                    className="toast align-items-center text-white bg-success border-0"
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                  >
+                    <div className="d-flex">
+                      <div className="toast-body fw-bold">
+                        ✅ Payroll added successfully!
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+                {activeTab === 'create' && userRole === 'Admin' && (
+
+                  <CreateJob
+                    employeeName={employeeName}
+                    taskName={taskName}
+                    taskState={taskState}
+                    deadline={deadline}
+                    taskDesc={taskDesc}
+                    assignedTo={assignedTo}
+                    priority={priority}
+                    progress={progress}
+                    assignedDateTime={assignedDateTime}
+                    setEmployeeName={setEmployeeName}
+                    setTaskName={setTaskName}
+                    setTaskState={setTaskState}
+                    setDeadline={setDeadline}
+                    setTaskDesc={setTaskDesc}
+                    setAssignedTo={setAssignedTo}
+                    setPriority={setPriority}
+                    setProgress={setProgress}
+                    setAssignedDateTime={setAssignedDateTime}
+                    handleAddTask={handleAddTask}
+                    editingIndex={editingIndex}
+                  />
+                )}
+
+                {activeTab === 'allocation' && (
+
+                  <WorkAllocation
+
+                    tasks={tasks}
+                    userRole={userRole}
+                    currentUser={currentUser}
+                    handleStatusUpdate={handleStatusUpdate}
+                    handleEditTask={handleEditTask}
+                    handleDeleteTask={handleDeleteTask}
+                    progressBadge={progressBadge}
+                    loadTasksFromSheet={loadTasksFromSheet}
+                  />
+                )}
+
+                {activeTab === 'progress' && (
+                  <ProgressOverview
+                    tasks={tasks}
+                    userRole={userRole}
+                  />
+                )}
+
+                {activeTab === 'payroll' && (
+                  <AdminPayroll
+                    userRole={userRole}
+                    employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
+                    postToGoogleSheetPayroll={postToGoogleSheet}
+                  />
+                )}
 
 
-              {activeTab === 'attendance' && userRole === 'Admin' && (
-                <Attendance
-                  employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
-                  postToGoogleSheetAttendance={postToGoogleSheetAttendance}
-                />
-              )}
+                {activeTab === 'attendance' && userRole === 'Admin' && (
+                  <Attendance
+                    employees={["UMESH", "MADHU", "RAKSHITHA", "ROJA", "BHUVANA"]}
+                    postToGoogleSheetAttendance={postToGoogleSheetAttendance}
+                  />
+                )}
 
-              {activeTab === 'attendance' && userRole === 'Employee' && (
-                <EmployeeAttendance
-                  currentUser={currentUser}
-                  postToGoogleSheetAttendance={postToGoogleSheetAttendance}
+                {activeTab === 'attendance' && userRole === 'Employee' && (
+                  <EmployeeAttendance
+                    currentUser={currentUser}
+                    postToGoogleSheetAttendance={postToGoogleSheetAttendance}
 
-                />
+                  />
 
-              )}
+                )}
 
-            </>
-          )}
-      </div>
+              </>
+            )}
+        </div>
 
-      <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 9999 }}>
-        <div id="toast-msg" className="toast align-items-center text-bg-primary border-0" role="alert">
-          <div className="d-flex">
-            <div className="toast-body">{toastMessage}</div>
-            <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 9999 }}>
+          <div id="toast-msg" className="toast align-items-center text-bg-primary border-0" role="alert">
+            <div className="d-flex">
+              <div className="toast-body">{toastMessage}</div>
+              <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
           </div>
         </div>
+        <footer className="text-center mt-5 py-3 text-white" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(6px)' }}>
+          <small>© 2025 SKR Career Guidance. All Rights Reserved.</small>
+        </footer>
       </div>
-      <footer className="text-center mt-5 py-3 text-white" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(6px)' }}>
-        <small>© 2025 SKR Career Guidance. All Rights Reserved.</small>
-      </footer>
     </div>
+
   );
 }
 
