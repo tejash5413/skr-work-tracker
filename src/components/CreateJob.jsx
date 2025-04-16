@@ -26,7 +26,7 @@ const CreateJob = ({
 
   return (
     <div className={darkMode ? 'bg-dark text-white min-vh-100' : 'min-vh-100'}>
-      <div className="p-4 shadow-sm card animate__animated animate__fadeInUp">
+      <div className="p-4 shadow-sm  animate__animated animate__fadeInUp">
         <h5 className="mb-3">Create a Job</h5>
         <div className="row g-3">
           <div className="col-md-6">

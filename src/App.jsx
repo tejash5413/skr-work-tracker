@@ -15,11 +15,11 @@ import logo from './assets/SKR_Logo.png';
 import './App.css';
 import 'animate.css';
 import loginImg from './assets/login.svg';
-import jobImg from './assets/job.svg';
+import jobImg from './assets/job.png';
 import workImg from './assets/work.svg';
 import attendence from './assets/Aatten.svg';
-import payroll from './assets/payroll.svg';
-import progressimg from './assets/progressimg.svg';
+import payroll from './assets/payroll.png';
+import progressimg from './assets/progressimg.png';
 
 
 import AdminPayroll from './components/AdminPayroll';
@@ -259,7 +259,7 @@ function App() {
           <div className="d-flex align-items-center mb-4">
             <div className="d-flex align-items-center">
               <img src={logo} alt="SKR Logo" style={{ width: '60px', height: '60px', marginRight: '15px' }} />
-              <h2 className="mb-0 fw-bold" style={{ color: '#6b400d' }}>SKR Work Progress Tracker</h2>
+              <h2 className="mb-0 fw-bold" >SKR Work Progress Tracker</h2>
             </div>
           </div>
           {!loggedIn ? (
