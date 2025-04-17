@@ -166,10 +166,15 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
 
     const averageHours = () => {
         const grouped = {};
+
         filtered.forEach(({ employee, totalHours }) => {
+            const hours = parseFloat(totalHours);
+            if (isNaN(hours)) return; // skip invalid entries
+
             if (!grouped[employee]) grouped[employee] = [];
-            grouped[employee].push(Number(totalHours));
+            grouped[employee].push(hours);
         });
+
         return Object.entries(grouped).map(([emp, hours]) => ({
             employee: emp,
             average: (hours.reduce((a, b) => a + b, 0) / hours.length).toFixed(2)
@@ -237,21 +242,23 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {paginatedRecords.map((r, i) => (
-                        <tr key={i}>
-                            <td>{i + 1}</td>
-                            <td>{r.employee}</td>
-                            <td>{r.date}</td>
-                            <td>{formatTime(r.loginTime)}</td>
-                            <td>{formatTime(r.logoutTime)}</td>
-                            <td>{r.totalHours}</td>
-                            {userRole === 'Admin' && (
-                                <td>
-                                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteRecord(r)}>🗑 Delete</button>
-                                </td>
-                            )}
-                        </tr>
-                    ))}
+                    {paginatedRecords
+                        .filter(r => userRole === 'Admin' || r.employee === currentUser) // 👈 filter based on role
+                        .map((r, i) => (
+                            <tr key={i}>
+                                <td>{i + 1}</td>
+                                <td>{r.employee}</td>
+                                <td>{r.date}</td>
+                                <td>{formatTime(r.loginTime)}</td>
+                                <td>{formatTime(r.logoutTime)}</td>
+                                <td>{r.totalHours}</td>
+                                {userRole === 'Admin' && (
+                                    <td>
+                                        <button className="btn btn-sm btn-danger" onClick={() => handleDeleteRecord(r)}>🗑 Delete</button>
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
                 </tbody>
             </table>
 

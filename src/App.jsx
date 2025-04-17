@@ -53,7 +53,8 @@ function App() {
     MADHU: 'SKR@1111',
     RAKSHITHA: 'SKR@1111',
     ROJA: 'SKR@1111',
-    BHUVANA: 'SKR@1111'
+    BHUVANA: 'SKR@1111',
+    SIVA: 'SKR@1111'
   };
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
