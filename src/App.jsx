@@ -260,7 +260,7 @@ function App() {
           <div className="d-flex align-items-center mb-4">
             <div className="d-flex align-items-center">
               <img src={logo} alt="SKR Logo" style={{ width: '60px', height: '60px', marginRight: '15px' }} />
-              <h2 className="mb-0 fw-bold" >SKR Work Progress Tracker</h2>
+              <h2 className="mb-0 fw-bold" >SKR Control Manager</h2>
             </div>
           </div>
           {!loggedIn ? (
@@ -282,7 +282,7 @@ function App() {
                 <div className=" d-flex justify-content-between align-items-center mb-3">
                   <h3>Task Management Tool</h3>
                   <div className=" d-none d-md-flex d-flex align-items-center gap-2">
-                    <span className="  text-center fw-bold mb-10">{userRole}</span>
+                    <span className="btn btn-primary text-center fw-bold mb-10">{userRole}</span>
                     <button className="btn btn-outline-dark btn-sm fw-bold bg-success text-white" onClick={() => setDarkMode(!darkMode)}>{darkMode ? 'Light Mode' : 'Dark Mode'}</button>
                     <button className="btn btn-danger btn-sm fw-bold  " onClick={handleLogout}>Logout</button>
                   </div>

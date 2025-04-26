@@ -135,6 +135,7 @@ const AdminPayroll = ({ employees, userRole }) => {
   const formatDateToDMY = (isoDate) => {
     if (!isoDate) return '';
     const date = new Date(isoDate);
+    if (isNaN(date.getTime())) return ''; // Check if the date is invalid
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -290,6 +291,8 @@ const AdminPayroll = ({ employees, userRole }) => {
     }
   };
   const generatePDF = (record) => {
+    const formattedDate = formatDateToDMY(record.joiningDate);
+
     const doc = new jsPDF();
     const image = new Image();
     const matched = employeesData.find(emp => emp.fullName === record.employee);
@@ -323,7 +326,7 @@ const AdminPayroll = ({ employees, userRole }) => {
           ['CTC', record.salary],
           ['Department', record.department],
           ['Designation', record.designation],
-          ['Joining Date', record.joiningDate ? formatDateToDMY(record.joiningDate) : ''],
+          ['Joining Date', formattedDate || ''],
           ['Month', new Date(record.month).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })]
         ],
         theme: 'grid',
