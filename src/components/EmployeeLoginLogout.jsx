@@ -6,18 +6,34 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
     const [records, setRecords] = useState([]);
     const [filterMonth, setFilterMonth] = useState('');
     const [filterEmployee, setFilterEmployee] = useState('');
-    const today = new Date().toLocaleDateString('en-IN').replaceAll('/', '-');
+    const today = `${new Date().getDate()}-${new Date().getMonth() + 1}-${new Date().getFullYear()}`;
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedRecords = records.slice(startIndex, startIndex + itemsPerPage);
     const calculateHours = (login, logout) => {
-        const [loginH, loginM] = login.split(':').map(Number);
-        const [logoutH, logoutM] = logout.split(':').map(Number);
-        let total = (logoutH * 60 + logoutM) - (loginH * 60 + loginM);
-        return (total / 60).toFixed(2);
+        if (!login || !logout) return '';
+
+        // Create date objects using a fixed date (e.g., 1970-01-01) and the provided time
+        const loginDate = new Date(`1970-01-01T${login}:00Z`);
+        const logoutDate = new Date(`1970-01-01T${logout}:00Z`);
+
+        // Check for invalid date objects
+        if (isNaN(loginDate) || isNaN(logoutDate)) return '';
+
+        // Convert times to minutes for easier calculation
+        const loginMinutes = loginDate.getUTCHours() * 60 + loginDate.getUTCMinutes();
+        const logoutMinutes = logoutDate.getUTCHours() * 60 + logoutDate.getUTCMinutes();
+
+        let totalMinutes = logoutMinutes - loginMinutes;
+
+        // If logout time is earlier than login time (i.e., logged out after midnight), add 24 hours
+        if (totalMinutes < 0) totalMinutes += 24 * 60;
+
+        // Convert minutes to hours and return
+        return (totalMinutes / 60).toFixed(2);
     };
+
     useEffect(() => {
         setCurrentPage(1);
     }, [filterMonth, filterEmployee]);
@@ -66,6 +82,7 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
     };
 
     const sendToGoogleSheetL = async (record) => {
+        console.log('Sending record to Google Sheet:', record);  // Check the data before sending
         try {
             await fetch("https://script.google.com/macros/s/AKfycby06KKg93F7RTIpsy0L-LcRLNaOLgeRLLVtXJ4xPIX2C5qlZksvockNHJhiowx1_X1z/exec", {
                 method: 'POST',
@@ -117,7 +134,9 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
         }
 
         setRecords(updatedRecords);
-        await sendToGoogleSheetL(updatedRecords[existingIndex] || updatedRecords[updatedRecords.length - 1]);
+        const recordToSend = updatedRecords[existingIndex] || updatedRecords[updatedRecords.length - 1];
+        await sendToGoogleSheetL(recordToSend); // Ensure totalHours is sent along
+
         setLoginTime('');
         alert("✅ Login time recorded!");
     };
@@ -142,12 +161,16 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
                 date: today,
                 loginTime: '',
                 logoutTime,
-                totalHours: ''
+                totalHours: calculateHours('', logoutTime)
             });
         }
 
         setRecords(updatedRecords);
-        await sendToGoogleSheetL(updatedRecords[existingIndex] || updatedRecords[updatedRecords.length - 1]);
+        const recordToSend = updatedRecords[existingIndex] || updatedRecords[updatedRecords.length - 1];
+        console.log("Record to send:", recordToSend);  // Log for debugging
+
+        await sendToGoogleSheetL(recordToSend); // Ensure totalHours is sent along
+
         setLogoutTime('');
         alert("✅ Logout time recorded!");
     };
@@ -163,6 +186,7 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
 
         return matchMonth && matchEmployee;
     });
+    const paginatedRecords = filtered.slice(startIndex, startIndex + itemsPerPage);
 
     const averageHours = () => {
         const grouped = {};
