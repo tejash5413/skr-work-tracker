@@ -58,7 +58,8 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
         if (!confirmDelete) return;
 
         try {
-            await fetch("https://script.google.com/macros/s/AKfycby06KKg93F7RTIpsy0L-LcRLNaOLgeRLLVtXJ4xPIX2C5qlZksvockNHJhiowx1_X1z/exec", {
+            // Send delete request to Google Apps Script
+            const response = await fetch("https://script.google.com/macros/s/AKfycby06KKg93F7RTIpsy0L-LcRLNaOLgeRLLVtXJ4xPIX2C5qlZksvockNHJhiowx1_X1z/exec", {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
@@ -69,7 +70,12 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
                 }),
             });
 
-            // Remove locally
+            // Check if the response is okay (successful)
+            if (!response.ok) {
+                throw new Error('Failed to delete from Google Sheets');
+            }
+
+            // Remove record locally from state
             setRecords(prev => prev.filter(
                 r => !(r.employee === record.employee && r.date === record.date)
             ));
@@ -77,9 +83,10 @@ const EmployeeLoginLogout = ({ userRole, currentUser }) => {
             alert("🗑 Record deleted successfully!");
         } catch (error) {
             console.error("❌ Delete failed", error);
-            alert("❌ Failed to delete from Google Sheet");
+            alert("❌ Failed to delete from Google Sheets");
         }
     };
+
 
     const sendToGoogleSheetL = async (record) => {
         console.log('Sending record to Google Sheet:', record);  // Check the data before sending
